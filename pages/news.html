@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<br lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>RP3CD</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+    data-tag="font" />
+  <link rel="stylesheet" href="../home.css" />
+  <link rel="stylesheet" href="../style.css" />
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+    } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCXyb94zGNBh9z4lg_jQYzbUoI2EDQ5rJs",
+      authDomain: "rp3cd-9c37b.firebaseapp.com",
+      projectId: "rp3cd-9c37b",
+      storageBucket: "rp3cd-9c37b.appspot.com",
+      messagingSenderId: "749174695525",
+      appId: "1:749174695525:web:1a899ccf7c9a8cb35ac88c",
+      measurementId: "G-845SC2N1F5",
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Fetch news data from Firestore
+    async function fetchNews() {
+      console.log("Fetching news from Firestore...");
+      const newsCol = collection(db, "news");
+      const newsSnapshot = await getDocs(newsCol);
+      const newsList = newsSnapshot.docs.map((doc) => doc.data());
+      console.log(newsList);
+      return newsList;
+    }
+
+    fetchNews();
+    // console.log(fetchNews());
+    import { createApp, reactive } from 'https://unpkg.com/petite-vue?module'
+    // const newsApp = createApp({
+
+    //   news: [],
+    //   async fetchNewsFromFirebase() {
+    //     try {
+    //       this.news = await fetchNews();
+
+    //     } catch (error) {
+    //       console.log(error);
+    //     }
+    //   },
+    //   mounted() {
+    //     this.fetchNewsFromFirebase();
+    //   },
+    // });
+
+    const newsApp = reactive({
+      news: [],
+      async fetchNewsFromFirebase() {
+        console.log("trying to fetch news from firebase...");
+        this.news = await fetchNews();
+        console.log(this.news);
+      },
+    });
+
+    newsApp.fetchNewsFromFirebase();
+
+    createApp({ newsApp }).mount("#news-container");
+
+
+    // newsApp.mount('#news-container');
+  </script>
+
+</head>
+
+<br>
+<nav class="home-head">
+  <img src="../public/external/logo%20rp3cd-200h.png" alt="image" class="home-image" />
+  <div class="home-menu">
+    <a href="/index.html#inicio" class="home-link08 button">Início</a>
+    <a href="/index.html#a-rede" class="home-link08 button">A rede</a>
+    <a href="/index.html#objetivos" class="home-link09 button">
+      Objetivos
+    </a>
+    <a href="/index.html#plano-de-acoes" class="home-link10 button">
+      Plano de ações
+    </a>
+    <a href="/index.html#contato" class="home-link11 button">
+      Contato
+    </a>
+    <a href="/pages/news.html" class="home-link12 button">
+      Notícias</a>
+    <a href="/pages/photos.html" class="home-link13 button">
+      Fotos</a>
+  </div>
+</nav>
+
+<section id="a-news" class="home-div">
+  <div id="news-container">
+    <div v-for="item in newsApp.news">
+      <h2>{{item.title}}</h2>
+      <p>{{item.url}}</p>
+    </div>
+  </div>
+
+
+</section>
+
+<!-- START OF NEWS DISPLAY -->
+<!-- <div id="news-container">
+  <div v-for="item in news">
+    <p>macaco 2</p>
+    <h2>{{item.title}}</h2>
+    <p>{{item.url}}</p>
+  </div>
+</div> -->
+
+
+
+</body>
+
+</html>
