@@ -39,39 +39,37 @@
 
     // Fetch news data from Firestore
     async function fetchNews() {
-      console.log("Fetching news from Firestore...");
       const newsCol = collection(db, "news");
       const newsSnapshot = await getDocs(newsCol);
       const newsList = newsSnapshot.docs.map((doc) => doc.data());
-      console.log(newsList);
       return newsList;
     }
 
-    fetchNews();
-    // console.log(fetchNews());
     import { createApp, reactive } from 'https://unpkg.com/petite-vue?module'
-    // const newsApp = createApp({
-
-    //   news: [],
-    //   async fetchNewsFromFirebase() {
-    //     try {
-    //       this.news = await fetchNews();
-
-    //     } catch (error) {
-    //       console.log(error);
-    //     }
-    //   },
-    //   mounted() {
-    //     this.fetchNewsFromFirebase();
-    //   },
-    // });
 
     const newsApp = reactive({
       news: [],
+      isLoading: true,
       async fetchNewsFromFirebase() {
-        console.log("trying to fetch news from firebase...");
-        this.news = await fetchNews();
-        console.log(this.news);
+        const fethedNews = await fetchNews();
+        fethedNews.sort((a, b) => b.datePosted.seconds - a.datePosted.seconds);
+        this.news = fethedNews.map(item => ({
+          ...item,
+          datePosted: this.formatDate(item.datePosted),
+        }));
+        this.isLoading = false;
+
+      },
+      formatDate(datePosted) {
+        if (datePosted && datePosted.seconds) {
+          const date = new Date(datePosted.seconds * 1000);
+          const day = date.getDate();
+          const month = date.getMonth() + 1; // JavaScript months are 0-indexed.
+          const year = date.getFullYear();
+
+          return `${day}/${month}/${year}`;
+        }
+        return '';
       },
     });
 
@@ -107,16 +105,31 @@
   </div>
 </nav>
 
-<section id="a-news" class="home-div">
+<section id="a-news" class="home-div" data-theme="light">
+  <span class="home-text004 h2"><span>Notícias</span></span>
+
   <div id="news-container">
-    <div v-for="item in newsApp.news">
-      <h2>{{item.title}}</h2>
-      <p>{{item.url}}</p>
+    <div class="home-texto">
+      <!-- Spinner is shown while news are loading -->
+      <div v-if="newsApp.isLoading">
+        <p aria-busy="true"></p>
+      </div>
+
+      <!-- News are shown when loading is finished -->
+      <div class="grid" v-else>
+        <div class="column-xs-12 column-md-4" v-for="item in newsApp.news">
+          <article data-theme="light">
+            <header>{{item.datePosted}} - {{item.title}}</header>
+            {{item.subTitle}} <a :href="item.url" class="card-link" target="_blank">Leia Mais</a>
+          </article>
+        </div>
+      </div>
     </div>
   </div>
-
-
 </section>
+
+
+
 
 <!-- START OF NEWS DISPLAY -->
 <!-- <div id="news-container">
